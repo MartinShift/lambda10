@@ -1,13 +1,13 @@
 {
   "version": "1.0",
   "name": "processor",
-  "func_name": "index.handler",
+  "func_name": "lambdas/processor/index.handler",
   "resource_type": "lambda",
   "iam_role_name": "processor-role",
   "runtime": "nodejs20.x",
   "memory": 128,
   "timeout": 100,
-  "lambda_path": "lambdas/processor",
+  "lambda_path": "lambdas\\processor",
   "dependencies": [],
   "event_sources": [],
   "env_variables": {
