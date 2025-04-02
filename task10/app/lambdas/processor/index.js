@@ -1,10 +1,13 @@
-const AWS = require('aws-sdk');
 const AWSXRay = require('aws-xray-sdk-core');
+const AWS = AWSXRay.captureAWS(require('aws-sdk'));
 const https = require('https');
 const { v4: uuidv4 } = require('uuid');
 
-const dynamodb = AWSXRay.captureAWSClient(new AWS.DynamoDB.DocumentClient());
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = process.env.TARGET_TABLE;
+
+AWSXRay.captureHTTPsGlobal(https);
+AWSXRay.capturePromise();
 
 const fetchWeatherData = async () => {
   return new Promise((resolve, reject) => {
@@ -48,10 +51,12 @@ const storeWeatherData = async (data) => {
   return item;
 };
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   try {
-    const weatherData = await AWSXRay.captureAsyncFunc('fetchWeatherData', fetchWeatherData);
-    const storedItem = await AWSXRay.captureAsyncFunc('storeWeatherData', async () => storeWeatherData(weatherData));
+    const segment = AWSXRay.getSegment();
+    
+    const weatherData = await AWSXRay.captureAsyncFunc('fetchWeatherData', fetchWeatherData, segment);
+    const storedItem = await AWSXRay.captureAsyncFunc('storeWeatherData', async () => storeWeatherData(weatherData), segment);
     
     console.log('Weather data stored successfully');
     return {
