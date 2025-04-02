@@ -34,25 +34,25 @@ class Processor(AbstractLambda):
     @xray_recorder.capture('store_weather_data')
     def store_weather_data(self, data):
         item = {
-            'id': str(uuid.uuid4()),
-            'forecast': {
-                'elevation': data['elevation'],
-                'generationtime_ms': data['generationtime_ms'],
-                'hourly': {
-                    'temperature_2m': data['hourly']['temperature_2m'],
-                    'time': data['hourly']['time']
-                },
-                'hourly_units': {
-                    'temperature_2m': data['hourly_units']['temperature_2m'],
-                    'time': data['hourly_units']['time']
-                },
-                'latitude': data['latitude'],
-                'longitude': data['longitude'],
-                'timezone': data['timezone'],
-                'timezone_abbreviation': data['timezone_abbreviation'],
-                'utc_offset_seconds': data['utc_offset_seconds']
+        'id': str(uuid.uuid4()),
+        'forecast': {
+            'latitude': data['latitude'],
+            'longitude': data['longitude'],
+            'generationtime_ms': data['generationtime_ms'],
+            'utc_offset_seconds': data['utc_offset_seconds'],
+            'timezone': data['timezone'],
+            'timezone_abbreviation': data['timezone_abbreviation'],
+            'elevation': data['elevation'],
+            'hourly_units': {
+                'time': data['hourly_units']['time'],
+                'temperature_2m': data['hourly_units']['temperature_2m']
+            },
+            'hourly': {
+                'time': data['hourly']['time'],
+                'temperature_2m': data['hourly']['temperature_2m']
             }
         }
+    }
         self.table.put_item(Item=item)
 
     @xray_recorder.capture('handle_request')
@@ -65,9 +65,15 @@ class Processor(AbstractLambda):
             self.store_weather_data(weather_data)
             _LOG.info("Weather data stored successfully")
             return 200, {'message': 'Weather data stored successfully'}
+        except requests.RequestException as e:
+            _LOG.error(f"Error fetching weather data: {str(e)}")
+            return 500, {'error': 'Error fetching weather data'}
+        except boto3.exceptions.Boto3Error as e:
+            _LOG.error(f"Error storing data in DynamoDB: {str(e)}")
+            return 500, {'error': 'Error storing data in DynamoDB'}
         except Exception as e:
-            _LOG.error(f"Error occurred: {str(e)}")
-            return 500, {'error': str(e)}
+            _LOG.error(f"Unexpected error: {str(e)}")
+            return 500, {'error': 'Unexpected error occurred'}
 
 HANDLER = Processor()
 
