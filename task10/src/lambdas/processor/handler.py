@@ -21,8 +21,7 @@ class Processor(AbstractLambda):
         self.table = self.dynamodb.Table(TABLE_NAME)
 
     def validate_request(self, event) -> dict:
-        # For this task, we'll assume all requests are valid
-        return {'is_valid': True}
+        return {'is_valid': True, 'body': event}
 
     @xray_recorder.capture('fetch_weather_data')
     def fetch_weather_data(self):
@@ -64,7 +63,7 @@ class Processor(AbstractLambda):
             weather_data = self.fetch_weather_data()
             self.store_weather_data(weather_data)
             _LOG.info("Weather data stored successfully")
-            return 200, {'message': 'Weather data stored successfully'}
+            return 200, {'message': 'Weather data stored successfully', 'data': weather_data}
         except requests.RequestException as e:
             _LOG.error(f"Error fetching weather data: {str(e)}")
             return 500, {'error': 'Error fetching weather data'}
