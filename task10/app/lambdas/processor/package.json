@@ -1,0 +1,14 @@
+{
+  "name": "processor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1001.0",
+    "aws-xray-sdk-core": "^3.3.3",
+    "uuid": "^8.3.2"
+  }
+}

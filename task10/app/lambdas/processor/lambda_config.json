@@ -1,16 +1,16 @@
 {
   "version": "1.0",
   "name": "processor",
-  "func_name": "handler.lambda_handler",
+  "func_name": "index.handler",
   "resource_type": "lambda",
   "iam_role_name": "processor-role",
-  "runtime": "python3.10",
+  "runtime": "nodejs20.x",
   "memory": 128,
   "timeout": 100,
-  "lambda_path": "lambdas\\processor",
+  "lambda_path": "lambdas/processor",
   "dependencies": [],
   "event_sources": [],
-  "env_variables":  {
+  "env_variables": {
     "TARGET_TABLE": "${target_table}"
   },
   "publish_version": true,

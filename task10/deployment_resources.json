@@ -27,7 +27,7 @@
     "resource_type": "iam_policy",
     "tags": {}
   },
-  "Weather": {
+  "${target_table}": {
     "resource_type": "dynamodb_table",
     "hash_key_name": "id",
     "hash_key_type": "S",
